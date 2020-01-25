@@ -61,19 +61,33 @@ pub enum DataType {
     Number,
 }
 
+#[derive(Debug)]
+pub enum ClassAttribute {
+    NotRoot,
+}
+
 // 自定義的 Token 型別
 #[derive(Debug)]
 pub enum Token {
     Link,
     Class,
 
-    Symbol(String),
+    LeftCurlyBrace,
+    RightCurlyBrace,
+    LeftSquareBracket,
+    RightSquareBracket,
+
+    AttachTo,
+    Star,
+
+    Identifier(String),
     Type(DataType),
+    ClassAttribute(ClassAttribute),
 
     Regex(String),
 }
 
-pub fn lexer(source: &str) -> Vec<LogoToken> {
+pub fn lexer(source: &str) -> Vec<Token> {
     println!("詞法分析開始");
     let mut ret = Vec::new();
     let mut lexer = LogoToken::lexer(source);
@@ -85,8 +99,44 @@ pub fn lexer(source: &str) -> Vec<LogoToken> {
             LogoToken::End => {
                 break;
             }
-            token => {
-                ret.push(token);
+            LogoToken::LeftCurlyBrace => {
+                ret.push(Token::LeftCurlyBrace);
+            }
+            LogoToken::LeftSquareBracket => {
+                ret.push(Token::LeftSquareBracket);
+            }
+            LogoToken::RightCurlyBrace => {
+                ret.push(Token::RightCurlyBrace);
+            }
+            LogoToken::RightSquareBracket => {
+                ret.push(Token::RightSquareBracket);
+            }
+            LogoToken::Link => {
+                ret.push(Token::Link);
+            }
+            LogoToken::Class => {
+                ret.push(Token::Class);
+            }
+            LogoToken::AttachTo => {
+                ret.push(Token::AttachTo);
+            }
+            LogoToken::Star => {
+                ret.push(Token::Star);
+            }
+
+            LogoToken::OneLine => ret.push(Token::Type(DataType::OneLine)),
+            LogoToken::Text => ret.push(Token::Type(DataType::Text)),
+            LogoToken::Number => ret.push(Token::Type(DataType::Number)),
+
+            LogoToken::NotRoot => {
+                ret.push(Token::ClassAttribute(ClassAttribute::NotRoot));
+            }
+
+            LogoToken::Regex => {
+                ret.push(Token::Regex(lexer.slice().to_string()));
+            }
+            LogoToken::Identifier => {
+                ret.push(Token::Identifier(lexer.slice().to_string()));
             }
         }
         lexer.advance();
