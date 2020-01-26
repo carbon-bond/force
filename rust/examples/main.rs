@@ -1,4 +1,5 @@
-mod lexer;
+use force::lexer::lexer;
+
 fn main() {
     let source = "
 分類 新聞 {
@@ -21,7 +22,7 @@ fn main() {
    留言 --> *
 }
 ";
-    let tokens = lexer::lexer(&source);
+    let tokens = lexer(&source);
     for token in tokens {
         println!("{:?}", token);
     }
