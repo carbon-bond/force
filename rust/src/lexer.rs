@@ -22,7 +22,7 @@ pub enum LogoToken {
 
     // 宣告
     #[token = "分類"]
-    Class,
+    Category,
     #[token = "鍵結"]
     Link,
 
@@ -62,7 +62,7 @@ pub enum DataType {
 }
 
 #[derive(Debug)]
-pub enum ClassAttribute {
+pub enum CategoryAttribute {
     NotRoot,
 }
 
@@ -70,7 +70,7 @@ pub enum ClassAttribute {
 #[derive(Debug)]
 pub enum Token {
     Link,
-    Class,
+    Category,
 
     LeftCurlyBrace,
     RightCurlyBrace,
@@ -82,7 +82,7 @@ pub enum Token {
 
     Identifier(String),
     Type(DataType),
-    ClassAttribute(ClassAttribute),
+    CategoryAttribute(CategoryAttribute),
 
     Regex(String),
 }
@@ -114,8 +114,8 @@ pub fn lexer(source: &str) -> Vec<Token> {
             LogoToken::Link => {
                 ret.push(Token::Link);
             }
-            LogoToken::Class => {
-                ret.push(Token::Class);
+            LogoToken::Category => {
+                ret.push(Token::Category);
             }
             LogoToken::AttachTo => {
                 ret.push(Token::AttachTo);
@@ -129,7 +129,7 @@ pub fn lexer(source: &str) -> Vec<Token> {
             LogoToken::Number => ret.push(Token::Type(DataType::Number)),
 
             LogoToken::NotRoot => {
-                ret.push(Token::ClassAttribute(ClassAttribute::NotRoot));
+                ret.push(Token::CategoryAttribute(CategoryAttribute::NotRoot));
             }
 
             LogoToken::Regex => {
