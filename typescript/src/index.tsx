@@ -12,14 +12,18 @@ class CategoryShape {
 		this.entity = new Konva.Group({
 			x: x - CATEGORY_SIZE/2,
 			y: y - CATEGORY_SIZE/2,
-			draggable: true
 		});
 		const rect = new Konva.Rect({
 			width: CATEGORY_SIZE,
 			height: CATEGORY_SIZE,
 			cornerRadius: 5,
+			draggable: true,
 			stroke: 'black',
 			strokeWidth: 3,
+		});
+		rect.on('dragstart', () => {
+			rect.stopDrag();
+			this.entity.startDrag();
 		});
 		this.entity.on('mouseenter', () => {
 			this.add_arrow();
