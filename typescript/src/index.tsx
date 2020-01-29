@@ -5,9 +5,11 @@ import Konva from 'konva';
 
 const CATEGORY_SIZE = 80;
 class CategoryShape {
+	stage: Konva.Stage
 	entity: Konva.Group
 	layer: Konva.Layer
-	constructor(layer: Konva.Layer, x: number, y: number) {
+	constructor(stage: Konva.Stage, layer: Konva.Layer, x: number, y: number) {
+		this.stage = stage;
 		this.layer = layer;
 		this.entity = new Konva.Group({
 			x: x - CATEGORY_SIZE/2,
@@ -54,24 +56,49 @@ class CategoryShape {
 			const length = 25;
 			let end_x = start_x + p[0]*length;
 			let end_y = start_y + p[1]*length;
+			let points = [
+				start_x, start_y,
+				end_x, end_y,
+			];
 			const arrow = new Konva.Arrow({
 				stroke: '#baf',
 				fill: '#baf',
-				strokeWidth: 15,
-				hitStrokeWidth: 15,
+				strokeWidth: 10,
 				opacity: 0.5,
-				points: [
-					start_x, start_y,
-					(start_x + end_x) / 2, (start_y + end_y) / 2,
-					end_x, end_y,
-				]
+				points: points,
+				name: 'arrow_tool'
+			});
+			arrow.on('mousedown', () => {
+				this.remove_arrow();
+				const pos = this.stage.getPointerPosition();
+				let points = [
+					center_x, center_y,
+					pos.x - this.entity.position().x, pos.y - this.entity.position().y
+				];
+				const link = new Konva.Arrow({
+					stroke: '#baf',
+					fill: '#baf',
+					strokeWidth: 10,
+					opacity: 0.5,
+					points: points
+				});
+				this.stage.on('mousemove', (event) => {
+					console.log('mouse move');
+					const pos = this.stage.getPointerPosition();
+					points[2] = pos.x - this.entity.position().x;
+					points[3] = pos.y - this.entity.position().y;
+					link.setAttr('points', points);
+					this.layer.draw();
+				});
+				this.entity.add(link);
+				this.layer.draw();
 			});
 			this.entity.add(arrow);
 		}
 		this.layer.draw();
 	}
 	remove_arrow(): void {
-		this.entity.find('Arrow').each(a => a.destroy());
+		this.entity.find('.arrow_tool').each(a => a.destroy());
 		this.layer.draw();
 	}
 }
@@ -89,7 +116,7 @@ function canvas() {
 
 	stage.on('dblclick dbltap', function () {
 		let position = stage.getPointerPosition();
-		const category = new CategoryShape(layer, position.x, position.y);
+		const category = new CategoryShape(stage, layer, position.x, position.y);
 		layer.add(category.entity);
 		layer.draw();
 	});
