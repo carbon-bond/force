@@ -3,14 +3,25 @@ import { render } from 'react-dom';
 
 import Konva from 'konva';
 
+const state = {
+	last_in: null,
+	linking: false
+};
+
+// XXX
+let counter = 0;
+
 const CATEGORY_SIZE = 80;
 class CategoryShape {
 	stage: Konva.Stage
 	entity: Konva.Group
 	layer: Konva.Layer
+	id: string
 	constructor(stage: Konva.Stage, layer: Konva.Layer, x: number, y: number) {
 		this.stage = stage;
 		this.layer = layer;
+		this.id = `${counter}`;
+		counter++;
 		this.entity = new Konva.Group({
 			x: x - CATEGORY_SIZE/2,
 			y: y - CATEGORY_SIZE/2,
@@ -18,28 +29,31 @@ class CategoryShape {
 		const rect = new Konva.Rect({
 			width: CATEGORY_SIZE,
 			height: CATEGORY_SIZE,
+			id: this.id,
 			cornerRadius: 5,
 			draggable: true,
 			stroke: 'black',
 			strokeWidth: 3,
+			hitStrokeWidth: 40,
 		});
 		rect.on('dragstart', () => {
 			rect.stopDrag();
 			this.entity.startDrag();
 		});
-		this.entity.on('mouseenter', () => {
+		rect.on('mouseenter', () => {
+			state.last_in = this.id; 
 			this.add_arrow();
-		})
+		});
 		this.entity.on('mouseleave', () => {
+			state.last_in = null; 
 			this.remove_arrow();
-		})
+		});
 		this.entity.add(rect);
 		this.layer.add(this.entity);
 		this.add_arrow();
-		// this.layer.draw();
 	}
 	add_arrow(): void {
-		if (this.entity.find('Arrow').length > 0) {
+		if (this.entity.find('.ArrowTooltip').length > 0) {
 			return;
 		}
 		const center_x = CATEGORY_SIZE / 2;
@@ -66,7 +80,7 @@ class CategoryShape {
 				strokeWidth: 10,
 				opacity: 0.5,
 				points: points,
-				name: 'arrow_tool'
+				name: 'ArrowTooltip'
 			});
 			arrow.on('mousedown', () => {
 				this.remove_arrow();
@@ -78,16 +92,21 @@ class CategoryShape {
 				const link = new Konva.Arrow({
 					stroke: '#baf',
 					fill: '#baf',
+					name: 'Link',
 					strokeWidth: 10,
 					opacity: 0.5,
 					points: points
 				});
 				this.stage.on('mousemove', (event) => {
-					console.log('mouse move');
 					const pos = this.stage.getPointerPosition();
 					points[2] = pos.x - this.entity.position().x;
 					points[3] = pos.y - this.entity.position().y;
 					link.setAttr('points', points);
+					this.layer.draw();
+				});
+				this.stage.on('mouseup', () => {
+					this.stage.off('mousemove');
+					this.entity.find('.Link').each(a => a.destroy());
 					this.layer.draw();
 				});
 				this.entity.add(link);
@@ -98,7 +117,7 @@ class CategoryShape {
 		this.layer.draw();
 	}
 	remove_arrow(): void {
-		this.entity.find('.arrow_tool').each(a => a.destroy());
+		this.entity.find('.ArrowTooltip').each(a => a.destroy());
 		this.layer.draw();
 	}
 }
