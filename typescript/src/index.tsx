@@ -83,6 +83,7 @@ class CategoryShape {
 				name: 'ArrowTooltip'
 			});
 			arrow.on('mousedown', () => {
+				this.entity.zIndex(0);
 				this.remove_arrow();
 				const pos = this.stage.getPointerPosition();
 				let points = [
@@ -106,6 +107,7 @@ class CategoryShape {
 				});
 				this.stage.on('mouseup', () => {
 					this.stage.off('mousemove');
+					this.stage.off('mouseup');
 					this.entity.find('.Link').each(a => a.destroy());
 					this.layer.draw();
 				});
