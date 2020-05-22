@@ -19,6 +19,8 @@ pub enum LogoToken {
     LeftSquareBracket,
     #[token = "]"]
     RightSquareBracket,
+    #[token = ","]
+    Comma,
 
     // 宣告
     #[token = "分類"]
@@ -45,8 +47,14 @@ pub enum LogoToken {
     // 鍵結的符號
     #[token = "-->"]
     AttachTo,
+    #[token = "-"]
+    Minus,
+    #[token = "->"]
+    Arrow,
     #[token = "*"]
     Star,
+    #[token = "輸能"]
+    Transfuse,
 
     // 識別子，只能是中文、英文、數字、底線
     // TODO: 增強識別子的限制
@@ -77,7 +85,12 @@ pub enum Token {
     LeftSquareBracket,
     RightSquareBracket,
 
+    Comma,
+
     AttachTo,
+    Minus,
+    Arrow,
+    Transfuse,
     Star,
 
     Identifier(String),
@@ -111,6 +124,9 @@ pub fn lexer(source: &str) -> Vec<Token> {
             LogoToken::RightSquareBracket => {
                 ret.push(Token::RightSquareBracket);
             }
+            LogoToken::Comma => {
+                ret.push(Token::Comma);
+            }
             LogoToken::Link => {
                 ret.push(Token::Link);
             }
@@ -119,6 +135,15 @@ pub fn lexer(source: &str) -> Vec<Token> {
             }
             LogoToken::AttachTo => {
                 ret.push(Token::AttachTo);
+            }
+            LogoToken::Minus => {
+                ret.push(Token::Minus);
+            }
+            LogoToken::Arrow => {
+                ret.push(Token::Arrow);
+            }
+            LogoToken::Transfuse => {
+                ret.push(Token::Transfuse);
             }
             LogoToken::Star => {
                 ret.push(Token::Star);
