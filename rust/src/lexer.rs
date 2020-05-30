@@ -62,20 +62,20 @@ pub enum LogoToken {
     Identifier,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum DataType {
     OneLine,
     Text,
     Number,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum CategoryAttribute {
     NotRoot,
 }
 
 // 自定義的 Token 型別
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Token {
     Link,
     Category,
@@ -98,6 +98,9 @@ pub enum Token {
     CategoryAttribute(CategoryAttribute),
 
     Regex(String),
+
+    // 文本結束
+    End,
 }
 
 pub fn lexer(source: &str) -> Vec<Token> {
@@ -110,6 +113,7 @@ pub fn lexer(source: &str) -> Vec<Token> {
                 panic!("未定義的 token: {}", lexer.slice());
             }
             LogoToken::End => {
+                ret.push(Token::End);
                 break;
             }
             LogoToken::LeftCurlyBrace => {

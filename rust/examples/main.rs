@@ -1,4 +1,5 @@
 use force::lexer::lexer;
+use force::parser::Parser;
 
 fn main() {
     let source = "
@@ -38,7 +39,10 @@ fn main() {
 }
 ";
     let tokens = lexer(&source);
-    for token in tokens {
+    for token in &tokens {
         println!("{:?}", token);
     }
+    let mut parser = Parser::new(tokens);
+    let force = parser.parse();
+    println!("{:?}", force);
 }
