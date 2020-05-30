@@ -1,3 +1,5 @@
+use crate::CategoryAttribute;
+use crate::DataType;
 use logos::Logos;
 
 // 先藉助 logos 函式庫自動生成 LogoToken ，再將之轉成自定義的 Token
@@ -21,12 +23,8 @@ pub enum LogoToken {
     RightSquareBracket,
     #[token = ","]
     Comma,
-
-    // 宣告
-    #[token = "分類"]
-    Category,
-    #[token = "鍵結"]
-    Link,
+    #[token = "#"]
+    Sharp,
 
     // 域型別
     #[token = "單行"]
@@ -62,24 +60,9 @@ pub enum LogoToken {
     Identifier,
 }
 
-#[derive(Debug, Clone, PartialEq)]
-pub enum DataType {
-    OneLine,
-    Text,
-    Number,
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum CategoryAttribute {
-    NotRoot,
-}
-
 // 自定義的 Token 型別
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
-    Link,
-    Category,
-
     LeftCurlyBrace,
     RightCurlyBrace,
     LeftSquareBracket,
@@ -131,11 +114,9 @@ pub fn lexer(source: &str) -> Vec<Token> {
             LogoToken::Comma => {
                 ret.push(Token::Comma);
             }
-            LogoToken::Link => {
-                ret.push(Token::Link);
-            }
-            LogoToken::Category => {
-                ret.push(Token::Category);
+            // NOTE: 暫時爲了測試方便，將井字號視作結束符
+            LogoToken::Sharp => {
+                ret.push(Token::End);
             }
             LogoToken::AttachTo => {
                 ret.push(Token::AttachTo);

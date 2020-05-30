@@ -1,6 +1,18 @@
 pub mod lexer;
 pub mod parser;
 
+#[derive(Debug, Clone, PartialEq)]
+pub enum DataType {
+    OneLine,
+    Text,
+    Number,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum CategoryAttribute {
+    NotRoot,
+}
+
 struct Category {}
 
 struct Bond {}
