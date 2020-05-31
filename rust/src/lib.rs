@@ -2,31 +2,26 @@ pub mod lexer;
 pub mod parser;
 
 #[derive(Debug, Clone, PartialEq)]
+pub enum Bondee {
+    All,
+    Choices(Vec<String>),
+}
+// TODO: 處理輸能等等額外設定
+#[derive(Debug, Clone, PartialEq)]
+pub struct Tag {
+    name: String,
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub enum DataType {
+    Bond(Bondee),
+    TaggedBond(Bondee, Vec<Tag>),
     OneLine,
-    Text,
+    Text(Option<String>), // 正則表達式
     Number,
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum CategoryAttribute {
     NotRoot,
-}
-
-struct Category {}
-
-struct Bond {}
-
-struct Bonds {}
-
-struct Article {}
-
-// 一個板的發文規則
-struct Board {}
-
-impl Board {
-    // 判斷一篇文章能否在本板發表
-    fn can_publish(&self, article: &Article) -> bool {
-        unimplemented!();
-    }
 }

@@ -1,4 +1,5 @@
 use crate::lexer::Token;
+use crate::Bondee;
 use crate::CategoryAttribute;
 use crate::DataType;
 use regex::Regex;
@@ -47,6 +48,7 @@ pub struct Force {
 #[derive(Debug)]
 pub enum ForceError {
     NonExpect { expect: Token, fact: Token },
+    NoMeet { expect: String, fact: Token },
 }
 
 pub type ForceResult<T> = Result<T, ForceError>;
@@ -94,19 +96,69 @@ impl Parser {
         }
         ret
     }
-    fn get_datatype(&mut self) -> ForceResult<DataType> {
-        let ret = if let Token::Type(datatype) = &self.cur {
-            Ok(datatype.clone())
-        } else {
-            Err(ForceError::NonExpect {
-                expect: Token::Identifier("某個識別子".to_owned()),
+    fn parse_bondee(&mut self) -> ForceResult<Bondee> {
+        self.eat(Token::LeftSquareBracket)?;
+        match self.cur.clone() {
+            Token::Star => {
+                self.advance();
+                self.eat(Token::RightSquareBracket)?;
+                Ok(Bondee::All)
+            }
+            Token::Identifier(name) => {
+                let mut choices = vec![name.to_string()];
+                self.advance();
+                loop {
+                    match self.cur {
+                        Token::RightSquareBracket => {
+                            break;
+                        }
+                        _ => {
+                            self.eat(Token::Comma)?;
+                            let name = self.get_identifier()?;
+                            choices.push(name);
+                        }
+                    }
+                }
+                self.eat(Token::RightSquareBracket)?;
+                Ok(Bondee::Choices(choices))
+            }
+            _ => Err(ForceError::NoMeet {
+                expect: "* 或識別子".to_owned(),
                 fact: self.cur.clone(),
-            })
-        };
-        if let Ok(_) = ret {
-            self.advance();
+            }),
         }
-        ret
+    }
+    fn parse_datatype(&mut self) -> ForceResult<DataType> {
+        match self.cur {
+            Token::Number => {
+                self.advance();
+                Ok(DataType::Number)
+            }
+            Token::OneLine => {
+                self.advance();
+                Ok(DataType::OneLine)
+            }
+            Token::Text => {
+                self.advance();
+                match self.cur.clone() {
+                    Token::Regex(regex) => {
+                        self.advance();
+                        Ok(DataType::Text(Some(regex)))
+                    }
+                    _ => Ok(DataType::Text(None)),
+                }
+            }
+            Token::Bond => {
+                self.advance();
+                let bondee = self.parse_bondee()?;
+                Ok(DataType::Bond(bondee))
+            }
+            // Token::TaggedBond => {}
+            _ => Err(ForceError::NoMeet {
+                expect: "型別".to_owned(),
+                fact: self.cur.clone(),
+            }),
+        }
     }
     pub fn parse(&mut self) -> ForceResult<Force> {
         let categories = self.parse_categories()?;
@@ -136,12 +188,12 @@ impl Parser {
         };
         self.eat(Token::LeftCurlyBrace)?;
         loop {
-            if let Token::Type(_) = self.cur {
-                let datatype = self.get_datatype()?;
+            if let Token::RightCurlyBrace = self.cur {
+                break;
+            } else {
+                let datatype = self.parse_datatype()?;
                 let name = self.get_identifier()?;
                 category.fields.push(Field { datatype, name });
-            } else {
-                break;
             }
         }
         self.eat(Token::RightCurlyBrace)?;

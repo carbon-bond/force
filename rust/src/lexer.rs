@@ -33,6 +33,10 @@ pub enum LogoToken {
     Text,
     #[token = "數字"]
     Number,
+    #[token = "鍵結"]
+    Bond,
+    #[token = "帶籤鍵結"]
+    TaggedBond,
 
     // 分類的屬性
     #[token = "非根"]
@@ -70,6 +74,12 @@ pub enum Token {
 
     Comma,
 
+    OneLine,
+    Text,
+    Number,
+    Bond,
+    TaggedBond,
+
     AttachTo,
     Minus,
     Arrow,
@@ -77,7 +87,6 @@ pub enum Token {
     Star,
 
     Identifier(String),
-    Type(DataType),
     CategoryAttribute(CategoryAttribute),
 
     Regex(String),
@@ -134,9 +143,11 @@ pub fn lexer(source: &str) -> Vec<Token> {
                 ret.push(Token::Star);
             }
 
-            LogoToken::OneLine => ret.push(Token::Type(DataType::OneLine)),
-            LogoToken::Text => ret.push(Token::Type(DataType::Text)),
-            LogoToken::Number => ret.push(Token::Type(DataType::Number)),
+            LogoToken::OneLine => ret.push(Token::OneLine),
+            LogoToken::Text => ret.push(Token::Text),
+            LogoToken::Number => ret.push(Token::Number),
+            LogoToken::Bond => ret.push(Token::Bond),
+            LogoToken::TaggedBond => ret.push(Token::TaggedBond),
 
             LogoToken::NotRoot => {
                 ret.push(Token::CategoryAttribute(CategoryAttribute::NotRoot));
