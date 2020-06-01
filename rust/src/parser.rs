@@ -1,8 +1,6 @@
 use crate::lexer::Token;
-use crate::Bondee;
-use crate::CategoryAttribute;
 use crate::DataType;
-use regex::Regex;
+use crate::{Bondee, Tag};
 use std::collections::HashMap;
 
 #[derive(Debug)]
@@ -96,6 +94,27 @@ impl Parser {
         }
         ret
     }
+    fn parse_tags(&mut self) -> ForceResult<Vec<Tag>> {
+        let mut tags = Vec::new();
+        self.eat(Token::LeftCurlyBrace)?;
+        loop {
+            if let Token::RightCurlyBrace = self.cur {
+                self.advance();
+                break;
+            } else {
+                let tag = self.get_identifier()?;
+                println!("tag = {}", tag);
+                tags.push(Tag { name: tag });
+                self.eat(Token::LeftCurlyBrace)?;
+                while self.cur != Token::RightCurlyBrace {
+                    // TODO: 解析真實內容
+                    self.advance();
+                }
+                self.eat(Token::RightCurlyBrace)?;
+            }
+        }
+        Ok(tags)
+    }
     fn parse_bondee(&mut self) -> ForceResult<Bondee> {
         self.eat(Token::LeftSquareBracket)?;
         match self.cur.clone() {
@@ -153,7 +172,12 @@ impl Parser {
                 let bondee = self.parse_bondee()?;
                 Ok(DataType::Bond(bondee))
             }
-            // Token::TaggedBond => {}
+            Token::TaggedBond => {
+                self.advance();
+                let bondee = self.parse_bondee()?;
+                let tags = self.parse_tags()?;
+                Ok(DataType::TaggedBond(bondee, tags))
+            }
             _ => Err(ForceError::NoMeet {
                 expect: "型別".to_owned(),
                 fact: self.cur.clone(),
