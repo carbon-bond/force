@@ -1,17 +1,12 @@
 {
-  "name": "force-ts",
-  "version": "0.0.1",
-  "license": "MIT",
-  "devDependencies": {
-    "parcel-bundler": "^1.12.4",
-    "typescript": "^3.7.5"
-  },
+  "name": "force",
+  "version": "0.1.0",
+  "description": "力語言",
+  "main": "index.js",
   "scripts": {
-    "build": "parcel index.html"
+    "test": "ts-node demo.ts"
   },
-  "dependencies": {
-    "konva": "^4.1.2",
-    "react": "^16.0.0",
-    "react-dom": "^16.12.0"
-  }
+  "author": "",
+  "license": "ISC",
+  "dependencies": {}
 }
