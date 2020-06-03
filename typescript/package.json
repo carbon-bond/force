@@ -1,12 +1,22 @@
 {
-  "name": "force",
-  "version": "0.1.0",
-  "description": "力語言",
-  "main": "index.js",
-  "scripts": {
-    "test": "ts-node demo.ts"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {}
+	"name": "force",
+	"version": "0.1.0",
+	"description": "力語言",
+	"main": "index.js",
+	"scripts": {
+		"lint": "eslint --ignore-path .gitignore --ext .js --ext .ts --ext .tsx .",
+		"demo": "ts-node demo.ts"
+	},
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@types/moo": "^0.5.3",
+		"moo": "^0.5.1"
+	},
+	"devDependencies": {
+		"@typescript-eslint/eslint-plugin": "^3.1.0",
+		"@typescript-eslint/parser": "^3.1.0",
+		"eslint": "^7.1.0",
+		"typescript": "^3.9.3"
+	}
 }
