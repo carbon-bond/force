@@ -1,5 +1,5 @@
 // import * as parser from './src/parser';
-import { lexer } from './src/lexer';
+import { Parser } from './src/parser';
 
 let source = `
 新聞 {
@@ -36,14 +36,8 @@ let source = `
 }
 `;
 
-lexer.reset(source);
-// lexer.reset('  a');
-
-while (true) {
-	const token = lexer.next();
-	if (token == undefined) {
-		break;
-	} else {
-		console.log(token);
-	}
-}
+const parser = new Parser(source);
+const force = parser.parse();
+force.categories.forEach((value, key) => {
+	console.log(`${key} => ${JSON.stringify(value, null, 2)}`);
+})

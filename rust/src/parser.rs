@@ -184,25 +184,6 @@ impl Parser {
             }),
         }
     }
-    pub fn parse(&mut self) -> ForceResult<Force> {
-        let categories = self.parse_categories()?;
-        return Ok(Force {
-            categories,
-            links: HashMap::new(),
-        });
-    }
-    fn parse_categories(&mut self) -> ForceResult<Categories> {
-        let mut categories = HashMap::new();
-        loop {
-            if let Token::End = self.cur {
-                break;
-            } else {
-                let category = self.parse_category()?;
-                categories.insert(category.name.clone(), category);
-            }
-        }
-        return Ok(categories);
-    }
     fn parse_category(&mut self) -> ForceResult<Category> {
         let name = self.get_identifier()?;
         let mut category = Category {
@@ -222,5 +203,24 @@ impl Parser {
         }
         self.eat(Token::RightCurlyBrace)?;
         Ok(category)
+    }
+    fn parse_categories(&mut self) -> ForceResult<Categories> {
+        let mut categories = HashMap::new();
+        loop {
+            if let Token::End = self.cur {
+                break;
+            } else {
+                let category = self.parse_category()?;
+                categories.insert(category.name.clone(), category);
+            }
+        }
+        return Ok(categories);
+    }
+    pub fn parse(&mut self) -> ForceResult<Force> {
+        let categories = self.parse_categories()?;
+        return Ok(Force {
+            categories,
+            links: HashMap::new(),
+        });
     }
 }

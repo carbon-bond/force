@@ -60,7 +60,7 @@ pub enum LogoToken {
 
     // 識別子，只能是中文、英文、數字、底線
     // TODO: 增強識別子的限制
-    #[regex = "[^\\s/\\[\\]]+"]
+    #[regex = "[^\\s/\\[\\],]+"]
     Identifier,
 }
 

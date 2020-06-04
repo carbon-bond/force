@@ -23,7 +23,7 @@ let lexer = moo.compile({
 	star: '*',
 
 	regex: new RegExp('/[^/]+/'),
-	identifier: /[^\s/\[\]]+/
+	identifier: /[^\s/\[\],]+/
 });
 
 export {
