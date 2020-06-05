@@ -184,7 +184,7 @@ impl Parser {
     fn parse_categories(&mut self) -> ForceResult<Categories> {
         let mut categories = HashMap::new();
         loop {
-            if let Token::End = self.cur {
+            if let Token::Sharp = self.cur {
                 break;
             } else {
                 let category = self.parse_category()?;

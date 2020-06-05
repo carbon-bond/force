@@ -13,18 +13,28 @@ let lexer = moo.compile({
 	sharp: '#',
 	colon: ':',
 
-	one_line: '單行',
-	text: '文本',
-	number: '數字',
-	bond: '鍵結',
-	tagged_bond: '帶籤鍵結',
-
-	transfuse: '輸能',
 	star: '*',
 
 	regex: new RegExp('/[^/]+/'),
-	identifier: /[^\s/\[\],]+/
+
+	identifier: {
+		match: /[^\s/\[\],\{\}#:]+/, type: moo.keywords({
+			one_line: '單行',
+			text: '文本',
+			number: '數字',
+			bond: '鍵結',
+			tagged_bond: '帶籤鍵結',
+
+			transfuse: '輸能',
+		})
+	},
 });
+
+lexer.next = (next => () => {
+	let token;
+	while ((token = next.call(lexer)) && (token.type === 'whitespace' || token.type == 'new_line')) { }
+	return token;
+})(lexer.next);
 
 export {
 	lexer
