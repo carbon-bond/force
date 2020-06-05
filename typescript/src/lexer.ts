@@ -19,7 +19,7 @@ let lexer = moo.compile({
 	bond: '鍵結',
 	tagged_bond: '帶籤鍵結',
 
-	transufse: '輸能',
+	transfuse: '輸能',
 	star: '*',
 
 	regex: new RegExp('/[^/]+/'),
