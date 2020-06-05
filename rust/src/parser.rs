@@ -10,37 +10,16 @@ struct Field {
 }
 
 #[derive(Debug)]
-enum Linkees {
-    All,
-    Names(String),
-}
-
-#[derive(Debug)]
-enum Linkee {
-    All,
-    Name(String),
-}
-
-#[derive(Debug)]
 struct Category {
     name: String,
     fields: Vec<Field>,
-    link_to: Linkees, // 可以鏈接到的分類名稱
-}
-
-#[derive(Debug)]
-struct Link {
-    from: String,
-    to: Linkee,
 }
 
 type Categories = HashMap<String, Category>;
-type Links = HashMap<(String, Linkee), Link>;
 
 #[derive(Debug)]
 pub struct Force {
     categories: Categories,
-    links: Links,
 }
 
 #[derive(Debug)]
@@ -103,7 +82,6 @@ impl Parser {
                 break;
             } else {
                 let tag = self.get_identifier()?;
-                println!("tag = {}", tag);
                 tags.push(Tag { name: tag });
                 self.eat(Token::LeftCurlyBrace)?;
                 while self.cur != Token::RightCurlyBrace {
@@ -189,7 +167,6 @@ impl Parser {
         let mut category = Category {
             name,
             fields: Vec::new(),
-            link_to: Linkees::All, // NOTE: 先設置爲 ALL ，之後解析鍵結時再修改
         };
         self.eat(Token::LeftCurlyBrace)?;
         loop {
@@ -218,9 +195,6 @@ impl Parser {
     }
     pub fn parse(&mut self) -> ForceResult<Force> {
         let categories = self.parse_categories()?;
-        return Ok(Force {
-            categories,
-            links: HashMap::new(),
-        });
+        return Ok(Force { categories });
     }
 }

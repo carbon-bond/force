@@ -20,8 +20,3 @@ pub enum DataType {
     Text(Option<String>), // 正則表達式
     Number,
 }
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum CategoryAttribute {
-    NotRoot,
-}

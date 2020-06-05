@@ -1,5 +1,3 @@
-use crate::CategoryAttribute;
-use crate::DataType;
 use logos::Logos;
 
 // 先藉助 logos 函式庫自動生成 LogoToken ，再將之轉成自定義的 Token
@@ -38,21 +36,11 @@ pub enum LogoToken {
     #[token = "帶籤鍵結"]
     TaggedBond,
 
-    // 分類的屬性
-    #[token = "非根"]
-    NotRoot,
-
     // 正則表達式
     #[regex = "/[^/]+/"]
     Regex,
 
     // 鍵結的符號
-    #[token = "-->"]
-    AttachTo,
-    #[token = "-"]
-    Minus,
-    #[token = "->"]
-    Arrow,
     #[token = "*"]
     Star,
     #[token = "輸能"]
@@ -80,14 +68,10 @@ pub enum Token {
     Bond,
     TaggedBond,
 
-    AttachTo,
-    Minus,
-    Arrow,
     Transfuse,
     Star,
 
     Identifier(String),
-    CategoryAttribute(CategoryAttribute),
 
     Regex(String),
 
@@ -127,15 +111,6 @@ pub fn lexer(source: &str) -> Vec<Token> {
             LogoToken::Sharp => {
                 ret.push(Token::End);
             }
-            LogoToken::AttachTo => {
-                ret.push(Token::AttachTo);
-            }
-            LogoToken::Minus => {
-                ret.push(Token::Minus);
-            }
-            LogoToken::Arrow => {
-                ret.push(Token::Arrow);
-            }
             LogoToken::Transfuse => {
                 ret.push(Token::Transfuse);
             }
@@ -148,10 +123,6 @@ pub fn lexer(source: &str) -> Vec<Token> {
             LogoToken::Number => ret.push(Token::Number),
             LogoToken::Bond => ret.push(Token::Bond),
             LogoToken::TaggedBond => ret.push(Token::TaggedBond),
-
-            LogoToken::NotRoot => {
-                ret.push(Token::CategoryAttribute(CategoryAttribute::NotRoot));
-            }
 
             LogoToken::Regex => {
                 ret.push(Token::Regex(lexer.slice().to_string()));
