@@ -51,6 +51,8 @@ pub enum Token {
     // TODO: 增強識別子的限制
     #[regex("[^\\s/\\[\\]\\}\\{,#:]+", get_string)]
     Identifier(String),
+
+    End,
 }
 
 fn get_string(lex: &mut Lexer<Token>) -> String {
@@ -58,7 +60,13 @@ fn get_string(lex: &mut Lexer<Token>) -> String {
 }
 
 pub fn lexer(s: &str) -> Vec<Token> {
-    vec![]
+    let mut lex = Token::lexer(s);
+    let mut tokens = vec![];
+    while let Some(token) = lex.next() {
+        tokens.push(token);
+    }
+    tokens.push(Token::End);
+    return tokens;
 }
 
 #[cfg(test)]
