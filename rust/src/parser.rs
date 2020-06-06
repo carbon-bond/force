@@ -1,15 +1,15 @@
-use crate::lexer::Token;
+use crate::lexer::{lexer, Token};
 use crate::DataType;
 use crate::{Bondee, Tag};
 use std::collections::HashMap;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 struct Field {
     datatype: DataType,
     name: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 struct Category {
     name: String,
     fields: Vec<Field>,
@@ -196,5 +196,37 @@ impl Parser {
     pub fn parse(&mut self) -> ForceResult<Force> {
         let categories = self.parse_categories()?;
         return Ok(Force { categories });
+    }
+}
+
+pub fn parse(source: &str) -> ForceResult<Force> {
+    let tokens = lexer(source);
+    Parser::new(tokens).parse()
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn test_simple_category() -> ForceResult<()> {
+        let force = parse("新聞 {單行 記者 單行 網址}")?;
+        assert_eq!(force.categories.len(), 1);
+        assert_eq!(
+            force.categories.get("新聞").unwrap(),
+            &Category {
+                name: "新聞".to_owned(),
+                fields: vec![
+                    Field {
+                        datatype: DataType::OneLine,
+                        name: "記者".to_owned()
+                    },
+                    Field {
+                        datatype: DataType::OneLine,
+                        name: "網址".to_owned()
+                    }
+                ]
+            }
+        );
+        Ok(())
     }
 }

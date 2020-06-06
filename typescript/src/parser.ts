@@ -76,7 +76,6 @@ export class Parser {
 	}
 	advance(): void {
 		this.count = Math.min(this.count + 1, this.tokens.length);
-		console.log(`advance to ${this.count}`);
 	}
 	eat(expect: string): void {
 		if (this.cur().type == expect) {
@@ -230,4 +229,9 @@ export class Parser {
 			categories: this.parse_categories()
 		};
 	}
+}
+
+export function parse(source: string): Force {
+	const parser = new Parser(source);
+	return parser.parse();
 }
