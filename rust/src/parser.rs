@@ -1,15 +1,16 @@
 use crate::lexer::{lexer, Token};
 use crate::DataType;
 use crate::{Bondee, Tag};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 struct Field {
     datatype: DataType,
     name: String,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 struct Category {
     name: String,
     fields: Vec<Field>,
@@ -17,7 +18,7 @@ struct Category {
 
 type Categories = HashMap<String, Category>;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Force {
     categories: Categories,
 }

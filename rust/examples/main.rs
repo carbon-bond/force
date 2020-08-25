@@ -1,5 +1,6 @@
 use force::lexer::lexer;
 use force::parser::Parser;
+use serde_json;
 
 fn main() {
     let source = "
@@ -41,6 +42,7 @@ fn main() {
         println!("{:?}", token);
     }
     let mut parser = Parser::new(tokens);
-    let force = parser.parse();
+    let force = parser.parse().unwrap();
     println!("{:#?}", force);
+    println!("{}", serde_json::to_string(&force).unwrap());
 }
