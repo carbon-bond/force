@@ -41,13 +41,13 @@ pub struct Parser {
 }
 
 impl Parser {
-    pub fn new(source: String) -> Parser {
-        let tokens = lexer(&source);
+    pub fn new(source: &str) -> Parser {
+        let tokens = lexer(source);
         return Parser {
             count: 0,
             cur: tokens[0].0.clone(),
             tokens: tokens,
-            source: source,
+            source: source.to_owned(),
         };
     }
     fn advance(&mut self) {
@@ -208,7 +208,7 @@ impl Parser {
     }
 }
 
-pub fn parse(source: String) -> ForceResult<Force> {
+pub fn parse(source: &str) -> ForceResult<Force> {
     Parser::new(source).parse()
 }
 
@@ -217,7 +217,7 @@ mod test {
     use super::*;
     #[test]
     fn test_simple_category() -> ForceResult<()> {
-        let force = parse("新聞 {單行 記者 單行 網址}".to_owned())?;
+        let force = parse("新聞 {單行 記者 單行 網址}")?;
         assert_eq!(force.categories.len(), 1);
         assert_eq!(
             force.categories.get("新聞").unwrap(),

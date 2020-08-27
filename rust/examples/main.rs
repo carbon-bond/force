@@ -41,8 +41,7 @@ fn main() {
     for token in &tokens {
         println!("{:?}", token);
     }
-    let mut parser = Parser::new(source.to_owned());
+    let mut parser = Parser::new(source);
     let force = parser.parse().unwrap();
     println!("{:#?}", force);
-    println!("{}", serde_json::to_string(&force).unwrap());
 }
