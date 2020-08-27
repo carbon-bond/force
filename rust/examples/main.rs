@@ -1,6 +1,5 @@
 use force::lexer::lexer;
 use force::parser::Parser;
-use serde_json;
 
 fn main() {
     let source = "

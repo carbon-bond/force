@@ -4,6 +4,7 @@ use crate::{Bondee, Tag};
 use logos::Span;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::fmt;
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 struct Field {
@@ -30,6 +31,14 @@ pub enum ForceError {
     NonExpect { expect: Token, fact: Token },
     NoMeet { expect: String, fact: Token },
 }
+
+impl fmt::Display for ForceError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "力語言錯誤")
+    }
+}
+
+impl std::error::Error for ForceError {}
 
 pub type ForceResult<T> = Result<T, ForceError>;
 
