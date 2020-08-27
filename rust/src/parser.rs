@@ -7,23 +7,23 @@ use std::collections::HashMap;
 use std::fmt;
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
-struct Field {
-    datatype: DataType,
-    name: String,
+pub struct Field {
+    pub datatype: DataType,
+    pub name: String,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
-struct Category {
-    source: String,
-    name: String,
-    fields: Vec<Field>,
+pub struct Category {
+    pub source: String,
+    pub name: String,
+    pub fields: Vec<Field>,
 }
 
 type Categories = HashMap<String, Category>;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Force {
-    categories: Categories,
+    pub categories: Categories,
 }
 
 #[derive(Debug)]
