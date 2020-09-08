@@ -1,36 +1,54 @@
-use serde::{Deserialize, Serialize};
+use regex::Regex;
 use std::collections::HashMap;
 pub mod lexer;
 pub mod parser;
 use std::fmt;
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Bondee {
     All,
     Choices(Vec<String>),
 }
 // TODO: 處理輸能等等額外設定
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Tag {
     name: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub enum DataType {
     Bond(Bondee),
     TaggedBond(Bondee, Vec<Tag>),
     OneLine,
-    Text(Option<String>), // 正則表達式
+    Text(Option<Regex>), // 正則表達式
     Number,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+impl PartialEq for DataType {
+    fn eq(&self, other: &DataType) -> bool {
+        match (self, other) {
+            (DataType::Bond(bondee), DataType::Bond(other_bondee)) => bondee == other_bondee,
+            (
+                DataType::TaggedBond(bondee, tags),
+                DataType::TaggedBond(other_bondee, other_tags),
+            ) => bondee == other_bondee && tags == other_tags,
+            (DataType::OneLine, DataType::OneLine) => true,
+            (DataType::Text(Some(regex)), DataType::Text(Some(other_regex))) => {
+                regex.as_str() == other_regex.as_str()
+            }
+            (DataType::Number, DataType::Number) => true,
+            _ => false,
+        }
+    }
+}
+
+#[derive(Debug, PartialEq)]
 pub struct Field {
     pub datatype: DataType,
     pub name: String,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq)]
 pub struct Category {
     pub source: String,
     pub name: String,
@@ -39,7 +57,7 @@ pub struct Category {
 
 type Categories = HashMap<String, Category>;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug)]
 pub struct Force {
     pub categories: Categories,
 }
@@ -53,6 +71,9 @@ pub enum ForceError {
     NoMeet {
         expect: String,
         fact: lexer::Token,
+    },
+    InvalidRegex {
+        regex: String,
     },
 }
 
