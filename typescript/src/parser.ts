@@ -121,7 +121,7 @@ export class Parser {
 					this.advance();
 					return {
 						kind: 'text',
-						regex
+						regex: new RegExp(regex),
 					};
 				} else {
 					return {

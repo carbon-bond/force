@@ -63,7 +63,7 @@ mod tests {
     }
     #[test]
     fn test_regex() -> ForceResult<()> {
-        let source = "測試 {文本/^.{3, 5}$/ 文字}";
+        let source = "測試 {文本/^.{3,5}$/ 文字}";
         let category = parse_category(source)?;
         let data1 = json!({
             "文字": "12"

@@ -18,7 +18,7 @@ export type DataType = {
 	kind: 'one_line'
 } | {
 	kind: 'text',
-	regex: string | undefined
+	regex: RegExp | undefined
 } | {
 	kind: 'number'
 };
