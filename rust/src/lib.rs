@@ -2,6 +2,7 @@ use regex::Regex;
 use std::collections::HashMap;
 pub mod lexer;
 pub mod parser;
+pub mod validate;
 use std::fmt;
 
 #[derive(Debug, Clone, PartialEq)]
