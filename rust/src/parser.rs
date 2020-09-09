@@ -1,6 +1,8 @@
+use crate::defs::*;
 use crate::lexer::{lexer, Token};
-use crate::*;
 use logos::Span;
+use regex::Regex;
+use std::collections::HashMap;
 
 pub struct Parser {
     tokens: Vec<(Token, Span)>,
