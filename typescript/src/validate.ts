@@ -2,9 +2,16 @@ import { Bondee, DataType, Category } from './defs';
 
 export abstract class ValidatorTrait {
 	abstract validate_bondee(bondee: Bondee, data: any): boolean;
-	validate_datatype(datatype: DataType, data: any): boolean {
-		if (datatype.kind == 'number' && typeof data == 'number') {
+	validate_number(data: any): boolean {
+		if (typeof data == 'number') {
 			return true;
+		} else {
+			return false;
+		}
+	}
+	validate_datatype(datatype: DataType, data: any): boolean {
+		if (datatype.kind == 'number') {
+			return this.validate_number(data);
 		} else if (datatype.kind == 'one_line' && typeof data == 'string') {
 			return data.search('\n') == -1;
 		} else if (datatype.kind == 'text' && typeof data == 'string') {
