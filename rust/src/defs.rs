@@ -1,68 +1,132 @@
 use crate::lexer;
 use regex::Regex;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt;
+use std::sync::Arc;
+use typescript_definitions::TypeScriptify;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TypeScriptify)]
 pub enum Bondee {
+    // XXX: 輸能？
     All,
-    Choices(Vec<String>),
-}
-// TODO: 處理輸能等等額外設定
-#[derive(Debug, Clone, PartialEq)]
-pub struct Tag {
-    pub name: String,
+    Choices {
+        category: Vec<String>,
+        family: Vec<String>,
+    },
 }
 
-#[derive(Debug, Clone)]
-pub enum DataType {
+fn serialize_regex<S>(re: &Option<Regex>, s: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::Serializer,
+{
+    if let Some(re) = re {
+        s.serialize_str(&re.to_string())
+    } else {
+        s.serialize_none()
+    }
+}
+
+fn deserialize_regex<'de, D>(d: D) -> Result<Option<Regex>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let s: Option<&str> = serde::Deserialize::deserialize(d)?;
+    if let Some(s) = s {
+        let re = Regex::new(s).map_err(|e| serde::de::Error::custom(e.to_string()))?;
+        Ok(Some(re))
+    } else {
+        Ok(None)
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, TypeScriptify, Clone)]
+pub enum BasicDataType {
     Bond(Bondee),
-    TaggedBond(Bondee, Vec<Tag>),
     OneLine,
+    #[serde(
+        serialize_with = "serialize_regex",
+        deserialize_with = "deserialize_regex"
+    )]
     Text(Option<Regex>), // 正則表達式
     Number,
 }
 
-impl PartialEq for DataType {
-    fn eq(&self, other: &DataType) -> bool {
+impl PartialEq for BasicDataType {
+    fn eq(&self, other: &BasicDataType) -> bool {
         match (self, other) {
-            (DataType::Bond(bondee), DataType::Bond(other_bondee)) => bondee == other_bondee,
-            (
-                DataType::TaggedBond(bondee, tags),
-                DataType::TaggedBond(other_bondee, other_tags),
-            ) => bondee == other_bondee && tags == other_tags,
-            (DataType::OneLine, DataType::OneLine) => true,
-            (DataType::Text(Some(regex)), DataType::Text(Some(other_regex))) => {
+            (BasicDataType::Bond(bondee), BasicDataType::Bond(other_bondee)) => {
+                bondee == other_bondee
+            }
+            (BasicDataType::OneLine, BasicDataType::OneLine) => true,
+            (BasicDataType::Text(Some(regex)), BasicDataType::Text(Some(other_regex))) => {
                 regex.as_str() == other_regex.as_str()
             }
-            (DataType::Number, DataType::Number) => true,
+            (BasicDataType::Number, BasicDataType::Number) => true,
             _ => false,
         }
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, TypeScriptify)]
+pub enum DataType {
+    Optional(BasicDataType),
+    Single(BasicDataType),
+    Array {
+        t: BasicDataType,
+        min: usize,
+        max: usize,
+    },
+}
+
+impl DataType {
+    pub fn basic_type(&self) -> &BasicDataType {
+        match self {
+            DataType::Optional(t) => t,
+            DataType::Single(t) => t,
+            DataType::Array {
+                t,
+                min: _min,
+                max: _max,
+            } => t,
+        }
+    }
+}
+
+impl From<BasicDataType> for DataType {
+    fn from(t: BasicDataType) -> Self {
+        DataType::Single(t)
+    }
+}
+
+#[derive(Debug, PartialEq, Serialize, Deserialize, TypeScriptify)]
 pub struct Field {
     pub datatype: DataType,
     pub name: String,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, TypeScriptify)]
 pub struct Category {
     pub source: String,
     pub name: String,
+    pub family: Vec<String>,
     pub fields: Vec<Field>,
 }
 
-pub type Categories = HashMap<String, Category>;
+pub type Categories = HashMap<String, Arc<Category>>;
 
 #[derive(Debug)]
 pub struct Force {
+    pub families: HashMap<String, Vec<String>>,
     pub categories: Categories,
 }
 
 #[derive(Debug)]
 pub enum ForceError {
+    InvalidBond {
+        not_found_categories: Vec<String>,
+        not_found_families: Vec<String>,
+    },
     NonExpect {
         expect: lexer::Token,
         fact: lexer::Token,
